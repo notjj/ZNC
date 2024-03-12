@@ -58,7 +58,7 @@ class ZNC(callbacks.Plugin):
         """Writes the ZNC DB to the system."""
         fd = utils.file.AtomicFile(self.filename)
         writer = csv.writer(fd)
-        for (username, entry) in self._users.iteritems():
+        for (username, entry) in self._users.items():
             for (hostmask, key, channel) in entry:
                 writer.writerow([username, hostmask, key, channel])
         fd.close()
@@ -66,8 +66,8 @@ class ZNC(callbacks.Plugin):
     def _openUsers(self):
         """Opens up the ZNC DB from the system."""
         try:
-            fd = file(self.filename)
-        except EnvironmentError, e:
+            fd = open(self.filename)
+        except EnvironmentError as e:
             self.log.warning("Couldn't open %s: %s", self.filename, e)
             return
         reader = csv.reader(fd)
@@ -152,7 +152,7 @@ class ZNC(callbacks.Plugin):
         try:
             self._addUser(username, hostmask, key, channel)
             irc.replySuccess()
-        except ValueError, e:
+        except ValueError as e:
             irc.reply("Error adding {0} :: {1}".format(username, e))
 
     zncadduser = wrap(zncadduser, [('checkCapability', 'admin'), ('somethingWithoutSpaces'), ('somethingWithoutSpaces'), ('somethingWithoutSpaces'), ('somethingWithoutSpaces')])
@@ -200,7 +200,7 @@ class ZNC(callbacks.Plugin):
 
     def _zncresponse(self, key, challenge):
         """ Return a valid ZNC RESPONSE string using matching key and challenge. """
-        response = hashlib.md5(key + "::" + challenge).hexdigest()
+        response = hashlib.md5((key + "::" + challenge).encode()).hexdigest()
         return response
 
     ############
